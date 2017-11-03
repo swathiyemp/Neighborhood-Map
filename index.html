@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta name="viewport" content="initial-scale=1.0">
+   <meta charset="utf-8">
+   <title>KnockoutJS Map</title>
+   <link rel="stylesheet" href="styles/style.css">
+   <script src = "https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.1.0.js"
+         type = "text/javascript"></script>
+  </head>
+
+<body>
+  <div class="search" id="search">
+        <input placeholder="Search" class="search-box" id="search-box" data-bind="textInput: searchTerm, valueUpdate: 'afterkeydown'">
+  </div>
+
+  <div>
+  <ul data-bind="foreach: locItemlist">
+      <li data-bind="text: title"></li>
+  </ul>
+</div>
+
+  <div id="map"</div>
+
+  <script src="scripts/app1.js"></script>
+  <script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5RJWlxDJrpVH0xYOjCIdkBOqHOA1Vrn8&callback=initMap">
+  </script>
+</body>
+</html>
