@@ -41,14 +41,9 @@ map = new google.maps.Map(document.getElementById('map'), {
             id: i
           });
 
-          this.showMarker = ko.computed(function() {
-          if(this.visible() === true) {
-              this.marker.setMap(map);
-          } else {
-              this.marker.setMap(null);
-          }
-          return true;
-         }, this);
+         this.showMarker = ko.computed(function() {
+           this.marker.setMap(map);
+         });
 
          // Push the marker to our array of markers.
          this.markers.push(this.marker);
@@ -82,6 +77,7 @@ map = new google.maps.Map(document.getElementById('map'), {
           });
         }
       }
+
 
   var ViewModel = function() {
    var self = this;
