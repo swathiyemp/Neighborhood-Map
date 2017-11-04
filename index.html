@@ -10,19 +10,19 @@
   </head>
 
 <body>
-  <div class="search" id="search">
-        <input placeholder="Search" class="search-box" id="search-box" data-bind="textInput: searchTerm, valueUpdate: 'afterkeydown'">
+  <div>
+        <input placeholder="Search" class="search-box" id="search-box" data-bind="textInput: query, event: { keypress: filteredArray}">
   </div>
 
   <div>
   <ul data-bind="foreach: locItemlist">
-      <li data-bind="text: title, click: location"></li>
+      <li data-bind="text: title, click: $parent.show, css: {'selected': highlight()}"></li>
   </ul>
 </div>
 
   <div id="map"</div>
 
-  <script src="scripts/app1.js"></script>
+  <script src="scripts/app2.js"></script>
   <script async defer
      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5RJWlxDJrpVH0xYOjCIdkBOqHOA1Vrn8&callback=initMap">
   </script>
