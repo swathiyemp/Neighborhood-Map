@@ -41,7 +41,9 @@ map = new google.maps.Map(document.getElementById('map'), {
             id: i
           });
 
-
+         this.showMarker = ko.computed(function() {
+           this.marker.setMap(map);
+         });
 
          // Push the marker to our array of markers.
          this.markers.push(this.marker);
@@ -56,7 +58,9 @@ map = new google.maps.Map(document.getElementById('map'), {
         map.fitBounds(bounds);
       }
 
-
+      this.show = function(location) {
+        google.maps.event.trigger(self.marker, 'click');
+    };
       // This function populates the infowindow when the marker is clicked. We'll only allow
       // one infowindow which will open at the marker that is clicked, and populate based
       // on that markers position.
@@ -78,35 +82,33 @@ map = new google.maps.Map(document.getElementById('map'), {
   var ViewModel = function() {
    var self = this;
 
-   self.query = ko.observable('');
+   query: ko.observable('')
+
+   this.searchTerm = ko.observable('');
 
    this.locItemlist = ko.observableArray([]);
 
-   locations.forEach(function(location){
-   self.locItemlist.push(new locItem(location));
+   locations.forEach(function(locitem){
+   self.locItemlist.push(new locItem(locitem));
    });
 
    this.filteredList = ko.computed( function() {
            var filter = self.searchTerm().toLowerCase();
            if (!filter) {
-               self.locItemlist().forEach(function(location){
-                   location.visible(true);
+               self.locItemlist().forEach(function(locitem){
+                   locitem.visible(true);
                });
                return self.locItemlist();
            } else {
-               return ko.utils.arrayFilter(self.locItemlist(), function(location) {
-                   var string = location.title.toLowerCase();
+               return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
+                   var string = locitem.title.toLowerCase();
                    var result = (string.search(filter) >= 0);
-                   location.visible(result);
+                   locitem.visible(result);
                    return result;
                });
            }
        }, self);
-
-  self.show = function(location) {
-   google.maps.event.trigger(location, 'click');
-};
-
    }
+
 
  ko.applyBindings(new ViewModel());
