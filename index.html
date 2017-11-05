@@ -10,15 +10,17 @@
   </head>
 
 <body>
-  <div>
-        <input placeholder="Search" class="search-box" id="search-box" data-bind="textInput: query, event: { keypress: filteredArray}">
+  <div class="search" id="search">
+        <input placeholder="Search" class="search-box" id="search-box" data-bind="textInput: searchTerm, valueUpdate: 'afterkeydown'">
   </div>
 
   <div>
   <ul data-bind="foreach: filteredList">
-      <li data-bind="text: title, click: show"></li>
+      <li data-bind="text: title, click: $parent.show"></li>
   </ul>
 </div>
+
+
 
   <div id="map"</div>
 
