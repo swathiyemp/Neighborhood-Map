@@ -15,8 +15,8 @@
   </div>
 
   <div>
-  <ul data-bind="foreach: locItemlist">
-      <li data-bind="text: title, click: $parent.show, css: {'selected': highlight()}"></li>
+  <ul data-bind="foreach: filteredList">
+      <li data-bind="text: title, click: show"></li>
   </ul>
 </div>
 
