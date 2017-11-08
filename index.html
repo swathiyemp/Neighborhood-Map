@@ -1,18 +1,16 @@
-<!DOCTYPE html>
 <html lang="en">
  <head>
    <meta name="viewport" content="initial-scale=1.0">
    <meta charset="utf-8">
    <title>KnockoutJS Map</title>
    <link rel="stylesheet" href="styles/style.css">
-   <script src = "https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.1.0.js"
-         type = "text/javascript"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
   </head>
 
 <body>
-  <div class="search" id="search">
-        <input placeholder="Search" class="search-box" id="search-box" data-bind="textInput: searchTerm, valueUpdate: 'afterkeydown'">
-  </div>
+  <div>
+  <input class="search-box" data-bind="textInput: searchTerm, placeholder="Search Locations...">
+</div>
 
   <div>
   <ul data-bind="foreach: filteredList">
@@ -20,9 +18,7 @@
   </ul>
 </div>
 
-
-
-  <div id="map"</div>
+<div id ="map"</div>
 
   <script src="scripts/app1.js"></script>
   <script async defer
