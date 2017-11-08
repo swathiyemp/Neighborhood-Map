@@ -1,6 +1,8 @@
 var map;
-      // Create a new blank array for all the listing markers.
+
 var markers = [];
+var largeInfowindow;
+var viewModel;
 
 var locations = [
   {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
@@ -14,101 +16,101 @@ var locations = [
 var locItem = function(data) {
   this.title = ko.observable(data.title);
   this.location = ko.observable(data.location);
-
 this.visible = ko.observable(true);
-
-}
+};
 
 function initMap() {
-map = new google.maps.Map(document.getElementById('map'), {
-  center: {lat: 40.7413549, lng: -73.9980244},
-  zoom: 13
+
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat: 40.7413549, lng: -73.9980244},
+    zoom: 13
+  });
+
+  largeInfowindow = new google.maps.InfoWindow();
+  var bounds = new google.maps.LatLngBounds();
+  for (var i = 0; i < locations.length; i++) {
+    // Get the position from the location array.
+    var position = locations[i].location;
+    var title = locations[i].title;
+
+var marker = new google.maps.Marker({
+  map: map,
+  position: position,
+  title: title,
+  animation: google.maps.Animation.DROP,
+  id: i
 });
 
-        this.largeInfowindow = new google.maps.InfoWindow();
-        this.bounds = new google.maps.LatLngBounds();
-        // The following group uses the location array to create an array of markers on initialize.
-        for (var i = 0; i < locations.length; i++) {
-          // Get the position from the location array.
-          var position = locations[i].location;
-          var title = locations[i].title;
-          // Create a marker per location, and put into markers array.
-          this.marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            id: i
-          });
+viewModel.locItemlist()[i].marker = marker;
 
-         this.showMarker = ko.computed(function() {
-           this.marker.setMap(map);
-         });
+markers.push(marker);
 
-         // Push the marker to our array of markers.
-         this.markers.push(this.marker);
+marker.addListener('click', function() {
 
-          // Create an onclick event to open an infowindow at each marker.
-          this.marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-          });
-          bounds.extend(markers[i].position);
-        }
-        // Extend the boundaries of the map for each marker
-        map.fitBounds(bounds);
-      }
+  var marker= this;
 
-      this.show = function(location) {
-        google.maps.event.trigger(self.marker, 'click');
-    };
-      // This function populates the infowindow when the marker is clicked. We'll only allow
-      // one infowindow which will open at the marker that is clicked, and populate based
-      // on that markers position.
+  populateInfoWindow(this, largeInfowindow);
+});
 
-    this.populateInfoWindow = function(marker, infowindow) {
-        // Check to make sure the infowindow is not already opened on this marker.
-        if (infowindow.marker != marker) {
-          infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>');
-          infowindow.open(map, marker);
-          // Make sure the marker property is cleared if the infowindow is closed.
-          infowindow.addListener('closeclick',function(){
-            infowindow.setMarker = null;
-          });
-        }
-      }
+bounds.extend(markers[i].position);
+}
+// Extend the boundaries of the map for each marker
+map.fitBounds(bounds);
+}
+// This function populates the infowindow when the marker is clicked. We'll only allow
+// one infowindow which will open at the marker that is clicked, and populate based
+// on that markers position.
+
+function populateInfoWindow(marker, infowindow) {
+  // Check to make sure the infowindow is not already opened on this marker.
+  if (infowindow.marker != marker) {
+    infowindow.marker = marker;
+    infowindow.setContent('<div>' + marker.title + '</div>');
+    infowindow.open(map, marker);
+    // Make sure the marker property is cleared if the infowindow is closed.
+    infowindow.addListener('closeclick',function(){
+      infowindow.setMarker = null;
+    });
+  }
+};
 
 
-  var ViewModel = function() {
-   var self = this;
 
-   query: ko.observable('')
+var ViewModel = function() {
+ var self = this;
 
-   this.searchTerm = ko.observable('');
+this.searchTerm = ko.observable('');
 
-   this.locItemlist = ko.observableArray([]);
+this.locItemlist = ko.observableArray([]);
 
-   locations.forEach(function(locitem){
-   self.locItemlist.push(new locItem(locitem));
-   });
+locations.forEach(function(locitem){
+self.locItemlist.push(new locItem(locitem));
+});
 
-   this.filteredList = ko.computed( function() {
-           var filter = self.searchTerm().toLowerCase();
-           if (!filter) {
-               self.locItemlist().forEach(function(locitem){
-                   locitem.visible(true);
-               });
-               return self.locItemlist();
-           } else {
-               return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
-                   var string = locitem.title.toLowerCase();
-                   var result = (string.search(filter) >= 0);
-                   locitem.visible(result);
-                   return result;
-               });
-           }
-       }, self);
-   }
+this.show = function(location) {
+	google.maps.event.trigger(location.marker, 'click');
+	};
 
+  this.filteredList = ko.computed(function() {
+     var filter = self.searchTerm().toLowerCase();
+     if (!filter) {
+       self.locItemlist().forEach(function(locitem) {
+         locitem.visible(true);
+       });
+       return self.locItemlist();
+     } else {
+       return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
+         var string = locitem.title.toLowerCase();
+         var result = string.search(filter) >= 0;
+         // locitem.marker
+         // Marker setVisible() method
+         locitem.visible(result);
+         return result;
+       });
+     }
+});
+};
 
- ko.applyBindings(new ViewModel());
+viewModel = new ViewModel();
+
+ko.applyBindings(viewModel);
