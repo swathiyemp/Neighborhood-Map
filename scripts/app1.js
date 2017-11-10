@@ -1,116 +1,168 @@
 var map;
-
 var markers = [];
 var largeInfowindow;
 var viewModel;
 
-var locations = [
-  {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
-  {title: 'Chelsea Loft', location: {lat: 40.7444883, lng: -73.9949465}},
-  {title: 'Union Square Open Floor Plan', location: {lat: 40.7347062, lng: -73.9895759}},
-  {title: 'East Village Hip Studio', location: {lat: 40.7281777, lng: -73.984377}},
-  {title: 'TriBeCa Artsy Bachelor Pad', location: {lat: 40.7195264, lng: -74.0089934}},
-  {title: 'Chinatown Homey Space', location: {lat: 40.7180628, lng: -73.9961237}}
-];
+var locations = [{
+	title: 'Golden Gate Bridge',
+	location: {
+		lat: 37.820174,
+		lng: -122.478180
+	}
+}, {
+	title: 'Alcatraz Island',
+	location: {
+		lat: 37.827206,
+		lng: -122.42302
+	}
+}, {
+	title: 'Glacier Point',
+	location: {
+		lat: 37.730670,
+		lng: -119.573671
+	}
+}, {
+	title: 'Palm Springs Aerial Tramway',
+	location: {
+		lat: 33.837283,
+		lng: -116.614135
+	}
+}, {
+	title: 'USS Midway Museum',
+	location: {
+		lat: 32.713868,
+		lng: -117.175154
+	}
+}, {
+	title: 'Point Lobos',
+	location: {
+		lat: 36.522455,
+		lng: -121.952905
+	}
+}, {
+	title: 'Los Padres National Forest',
+	location: {
+		lat: 34.742170,
+		lng: -119.681856
+	}
+}, {
+	title: 'Death Valley National Park',
+	location: {
+		lat: 36.495427,
+		lng: -117.154668
+	}
+}];
 
 var locItem = function(data) {
-  this.title = ko.observable(data.title);
-  this.location = ko.observable(data.location);
-this.visible = ko.observable(true);
+	this.title = data.title;
+	this.location = ko.observable(data.location);
+	this.visible = ko.observable(true);
 };
 
+//Initializing the map
 function initMap() {
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: {
+			lat: 36.936234,
+			lng: -119.444914
+		},
+		gestureHandling: 'greedy',
+		zoom: 6
+	});
+	largeInfowindow = new google.maps.InfoWindow();
+	var bounds = new google.maps.LatLngBounds();
+	for (var i = 0; i < locations.length; i++) {
+		// Get the position from the location array.
+		var position = locations[i].location;
+		var title = locations[i].title;
+		var marker = new google.maps.Marker({
+			map: map,
+			position: position,
+			title: title,
+			animation: google.maps.Animation.DROP,
+			id: i
+		});
+		viewModel.locItemlist()[i].marker = marker;
+		markers.push(marker);
 
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 40.7413549, lng: -73.9980244},
-    zoom: 13
-  });
-
-  largeInfowindow = new google.maps.InfoWindow();
-  var bounds = new google.maps.LatLngBounds();
-  for (var i = 0; i < locations.length; i++) {
-    // Get the position from the location array.
-    var position = locations[i].location;
-    var title = locations[i].title;
-
-var marker = new google.maps.Marker({
-  map: map,
-  position: position,
-  title: title,
-  animation: google.maps.Animation.DROP,
-  id: i
-});
-
-viewModel.locItemlist()[i].marker = marker;
-
-markers.push(marker);
-
-marker.addListener('click', function() {
-
-  var marker= this;
-
-  populateInfoWindow(this, largeInfowindow);
-});
-
-bounds.extend(markers[i].position);
+		marker.addListener('click', function() {
+			var marker = this;
+			populateInfoWindow(this, largeInfowindow);
+		});
+		bounds.extend(markers[i].position);
+	}
+	// Extend the boundaries of the map for each marker
+	map.fitBounds(bounds);
 }
-// Extend the boundaries of the map for each marker
-map.fitBounds(bounds);
-}
-// This function populates the infowindow when the marker is clicked. We'll only allow
-// one infowindow which will open at the marker that is clicked, and populate based
-// on that markers position.
 
+//The Infowindow function that show location title and wiki info of that title.
 function populateInfoWindow(marker, infowindow) {
-  // Check to make sure the infowindow is not already opened on this marker.
-  if (infowindow.marker != marker) {
-    infowindow.marker = marker;
-    infowindow.setContent('<div>' + marker.title + '</div>');
-    infowindow.open(map, marker);
-    // Make sure the marker property is cleared if the infowindow is closed.
-    infowindow.addListener('closeclick',function(){
-      infowindow.setMarker = null;
-    });
-  }
-};
-
-
+	var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&imlimit=5&format=json&callback=wikiCallback';
+	// Wikipedia AJAX Request to show wiki information when clicked on a marker
+	$.ajax({
+		url: wikiUrl,
+		dataType: 'jsonp'
+	}).done(function(data) {
+		console.log(data);
+		var infoUrl = data[3][0];
+		var infoDesc = data[2][0];
+		if (infoUrl === undefined) {
+			infowindow.setContent('<div>' + '<h3>' + marker.title + '</h3>' + '<p>' + 'Sorry no wikipedia information is available' + '</p>' + '</div>');
+			infowindow.open(map, marker);
+		} else {
+			infowindow.marker = marker;
+			infowindow.setContent('<div class="info">' + '<h3>' + marker.title + '</h3>' + '<p>' + infoDesc + '<a href="' + infoUrl + '" target="blank">' + '..' + 'Click Here' + '</a>' + '</p>' + '</div>');
+     //Setting animation for map for a particular time
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+			setTimeout(function() {
+				marker.setAnimation(null);
+			}, 2000);
+			infowindow.open(map, marker);
+			map.setCenter();
+      //Closing the Infowindow
+			infowindow.addListener('closeclick', function() {
+				infowindow.setMarker = null;
+			});
+		}
+	})
+}
 
 var ViewModel = function() {
- var self = this;
-
-this.searchTerm = ko.observable('');
-
-this.locItemlist = ko.observableArray([]);
-
-locations.forEach(function(locitem){
-self.locItemlist.push(new locItem(locitem));
-});
-
-this.show = function(location) {
-	google.maps.event.trigger(location.marker, 'click');
+	var self = this;
+	this.searchTerm = ko.observable('');
+	this.locItemlist = ko.observableArray([]);
+	locations.forEach(function(locitem) {
+		self.locItemlist.push(new locItem(locitem));
+	});
+	this.show = function(location) {
+		google.maps.event.trigger(location.marker, 'click');
 	};
 
-  this.filteredList = ko.computed(function() {
-     var filter = self.searchTerm().toLowerCase();
-     if (!filter) {
-       self.locItemlist().forEach(function(locitem) {
-         locitem.visible(true);
-       });
-       return self.locItemlist();
-     } else {
-       return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
-         var string = locitem.title.toLowerCase();
-         var result = string.search(filter) >= 0;
-         // locitem.marker
-         // Marker setVisible() method
-         locitem.visible(result);
-         return result;
-       });
-     }
-});
+  //Search filter to filter the list options.
+	this.filteredList = ko.computed(function() {
+		var filter = self.searchTerm().toLowerCase();
+		if (!filter) {
+			self.locItemlist().forEach(function(locitem) {
+				locitem.visible(true);
+			});
+			return self.locItemlist();
+		} else {
+			return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
+        if (locitem.title.toLowerCase().indexOf(q) >= 0) {
+          return true;
+          } else {
+            locitem.marker.setVisible(false);
+          return false;
+          }
+			});
+		}
+	});
 };
 
 viewModel = new ViewModel();
-
 ko.applyBindings(viewModel);
+
+//Error Handling for Google Maps
+function showerror() {
+	document.getElementById('showerror').innerHTML = 'Google Maps have trouble loading.Please try later.';
+}
