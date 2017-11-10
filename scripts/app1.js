@@ -263,9 +263,16 @@ function initMap() {
 		},
 		gestureHandling: 'greedy',
 		zoom: 6,
-		styles: styles,
-                mapTypeControl: false
+    styles: styles,
+    mapTypeControl: false
 	});
+
+  // Style the markers a bit. This will be our listing marker icon.
+    var defaultIcon = makeMarkerIcon('CD5C5C');
+  // Create a "highlighted location" marker color for when the user
+  // mouses over the marker.
+    var highlightedIcon = makeMarkerIcon('FFFFFF');
+
 	largeInfowindow = new google.maps.InfoWindow();
 	var bounds = new google.maps.LatLngBounds();
 	for (var i = 0; i < locations.length; i++) {
@@ -277,6 +284,7 @@ function initMap() {
 			position: position,
 			title: title,
 			animation: google.maps.Animation.DROP,
+      icon: defaultIcon,
 			id: i
 		});
 		viewModel.locItemlist()[i].marker = marker;
@@ -286,6 +294,14 @@ function initMap() {
 			var marker = this;
 			populateInfoWindow(this, largeInfowindow);
 		});
+
+    marker.addListener('mouseover', function() {
+            this.setIcon(highlightedIcon);
+          });
+
+    marker.addListener('mouseout', function() {
+            this.setIcon(defaultIcon);
+          });
 		bounds.extend(markers[i].position);
 	}
 	// Extend the boundaries of the map for each marker
@@ -323,6 +339,16 @@ function populateInfoWindow(marker, infowindow) {
 		}
 	})
 }
+function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+          '|40|_|%E2%80%A2',
+          new google.maps.Size(21, 34),
+          new google.maps.Point(0, 0),
+          new google.maps.Point(10, 34),
+          new google.maps.Size(21,34));
+        return markerImage;
+      }
 
 var ViewModel = function() {
 	var self = this;
@@ -345,10 +371,10 @@ var ViewModel = function() {
 			return self.locItemlist();
 		} else {
 			return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
-                         var string = locitem.title.toLowerCase();
-                         var result = string.search(filter) >= 0;
-                         locitem.marker.setVisible(result);
-                          return result;
+        var string = locitem.title.toLowerCase();
+        var result = string.search(filter) >= 0;
+        locitem.marker.setVisible(result);
+        return result;
 			});
 		}
 	});
