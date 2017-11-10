@@ -1,28 +1,50 @@
+<!DOCTYPE html>
 <html lang="en">
- <head>
-   <meta name="viewport" content="initial-scale=1.0">
-   <meta charset="utf-8">
-   <title>KnockoutJS Map</title>
-   <link rel="stylesheet" href="styles/style.css">
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
-  </head>
-
-<body>
-  <div>
-  <input class="search-box" data-bind="textInput: searchTerm, placeholder="Search Locations...">
-</div>
-
-  <div>
-  <ul data-bind="foreach: filteredList">
-      <li data-bind="text: title, click: $parent.show"></li>
-  </ul>
-</div>
-
-<div id ="map"</div>
-
-  <script src="scripts/app1.js"></script>
-  <script async defer
-     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5RJWlxDJrpVH0xYOjCIdkBOqHOA1Vrn8&callback=initMap">
-  </script>
-</body>
-</html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0">
+			<meta charset="utf-8">
+				<title>KnockoutJS Map</title>
+				<link rel="stylesheet" href="styles/style.css">
+					<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+						<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
+						<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+						<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+					</head>
+					<body>
+						<nav class="navbar navbar-inverse">
+							<div class="container-fluid">
+								<div class="navbar-header">
+									<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+									</button>
+								</div>
+								<div class="container">
+									<div class ="row">
+										<div class="col-md-2">
+											<div class="collapse navbar-collapse" id="myNavbar">
+												<h1 class ="heading"> My Places </h1>
+												<div class="searchbox">
+													<input type="text" placeholder="search.."class="search-box" data-bind="textInput: searchTerm">
+													</div>
+													<div class="list1">
+														<ul class = "list-group" data-bind="foreach: filteredList">
+															<li data-bind="text: title, click: $parent.show"></li>
+														</ul>
+													</div>
+												</div>
+											</div>
+											<div class = "col-md-10">
+												<div id ="map" class="map-responsive">
+													<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6509921.993414264!2d-123.79914257109435!3d37.18424502170816!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb9fe5f285e3d%3A0x8b5109a227086f55!2sCalifornia!5e0!3m2!1sen!2sus!4v1510206176926" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+												</div>
+                        <div id = "showerror"></div>
+											</div>
+										</div>
+									</div>
+									<script src="scripts/app2.js"></script>
+									<script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5RJWlxDJrpVH0xYOjCIdkBOqHOA1Vrn8&callback=initMap"></script>
+								</body>
+							</html>
