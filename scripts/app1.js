@@ -148,12 +148,10 @@ var ViewModel = function() {
 			return self.locItemlist();
 		} else {
 			return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
-        if (locitem.title.toLowerCase().indexOf(q) >= 0) {
-          return true;
-          } else {
-            locitem.marker.setVisible(false);
-          return false;
-          }
+                         var string = locitem.title.toLowerCase();
+                         var result = string.search(filter) >= 0;
+                         locitem.marker.setVisible(result);
+                          return result;
 			});
 		}
 	});
