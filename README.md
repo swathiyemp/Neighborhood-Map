@@ -1,4 +1,4 @@
-#Neighborhood Map
+# Neighborhood Map
 
 This Project displays some of the top attractions of California in a google map.It also give the wikipedia information about the attraction when you click on the particular marker.There is also a filter functionality provided to make the search simple.It is also mobile friendly.
 
