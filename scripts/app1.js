@@ -215,6 +215,7 @@ function initMap() {
         mapTypeControl: false
     });
 
+
     // Styling the Markers
     var defaultIcon = makeMarkerIcon('CD5C5C');
     var highlightedIcon = makeMarkerIcon('FFFFFF');
@@ -222,7 +223,6 @@ function initMap() {
     largeInfowindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < locations.length; i++) {
-        // Get the position from the location array.
         var position = locations[i].location;
         var title = locations[i].title;
         var marker = new google.maps.Marker({
@@ -233,8 +233,10 @@ function initMap() {
             icon: defaultIcon,
             id: i
         });
+
         viewModel.locItemlist()[i].marker = marker;
         markers.push(marker);
+
 
         marker.addListener('click', function() {
             var marker = this;
@@ -254,36 +256,43 @@ function initMap() {
     map.fitBounds(bounds);
 }
 
-//The Infowindow function with Wikipedia
+//The Infowindow function that show location title and wiki info of that title.
 function populateInfoWindow(marker, infowindow) {
     var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&imlimit=5&format=json&callback=wikiCallback';
     // Wikipedia AJAX Request to show wiki information when clicked on a marker
     $.ajax({
-        url: wikiUrl,
-        dataType: 'jsonp'
-    }).done(function(data) {
-        console.log(data);
-        var infoUrl = data[3][0];
-        var infoDesc = data[2][0];
-        if (infoUrl === undefined) {
-            infowindow.setContent('<div>' + '<h3>' + marker.title + '</h3>' + '<p>' + 'Sorry no wikipedia information is available' + '</p>' + '</div>');
-            infowindow.open(map, marker);
-        } else {
-            infowindow.marker = marker;
-            infowindow.setContent('<div class="info">' + '<h3>' + marker.title + '</h3>' + '<p>' + infoDesc + '<a href="' + infoUrl + '" target="blank">' + '..' + 'Click Here' + '</a>' + '</p>' + '</div>');
-            //Setting animation for map for a particular time
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function() {
-                marker.setAnimation(null);
-            }, 2000);
-            infowindow.open(map, marker);
-            map.setCenter();
-            //Closing the Infowindow
-            infowindow.addListener('closeclick', function() {
-                infowindow.setMarker = null;
-            });
-        }
-    })
+            url: wikiUrl,
+            dataType: 'jsonp'
+        }).done(function(data) {
+            console.log(data);
+            if (data.error) {
+                alert("Wikipedia have some problem loading.Please try again.");
+                return;
+            }
+            var infoUrl = data[3][0];
+            var infoDesc = data[2][0];
+            if (infoUrl === undefined) {
+                infowindow.setContent('<div>' + '<h3>' + marker.title + '</h3>' + '<p>' + 'Sorry no wikipedia information is available' + '</p>' + '</div>');
+                infowindow.open(map, marker);
+            } else {
+                infowindow.marker = marker;
+                infowindow.setContent('<div class="info">' + '<h3>' + marker.title + '</h3>' + '<p>' + infoDesc + '<a href="' + infoUrl + '" target="blank">' + '..' + 'Click Here' + '</a>' + '</p>' + '</div>');
+                //Setting animation for map for a particular time
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(function() {
+                    marker.setAnimation(null);
+                }, 2000);
+                infowindow.open(map, marker);
+                map.setCenter();
+                //Closing the Infowindow
+                infowindow.addListener('closeclick', function() {
+                    infowindow.setMarker = null;
+                });
+            }
+        })
+        .fail(function() {
+            alert("Sorry Wikipedia Could'nt Load!");
+        });
 }
 
 function makeMarkerIcon(markerColor) {
@@ -308,22 +317,20 @@ var ViewModel = function() {
         google.maps.event.trigger(location.marker, 'click');
     };
 
-    //Creating the filter
+    //Search filter to filter the list options.
     this.filteredList = ko.computed(function() {
         var filter = self.searchTerm().toLowerCase();
-        if (!filter) {
-            self.locItemlist().forEach(function(locitem) {
-                locitem.visible(true);
-            });
-            return self.locItemlist();
-        } else {
-            return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
-                var string = locitem.title.toLowerCase();
-                var result = string.search(filter) >= 0;
-                locitem.marker.setVisible(result);
-                return result;
-            });
+        if (largeInfowindow) {
+            largeInfowindow.close();
         }
+        return ko.utils.arrayFilter(self.locItemlist(), function(locitem) {
+            var string = locitem.title.toLowerCase();
+            var result = string.search(filter) >= 0;
+            if (locitem.marker) {
+                locitem.marker.setVisible(result);
+            }
+            return result;
+        });
     });
 };
 
@@ -332,5 +339,5 @@ ko.applyBindings(viewModel);
 
 //Error Handling for Google Maps
 function showerror() {
-    document.getElementById('showerror').innerHTML = 'Google Maps have trouble loading.Please try later.';
+    alert('Google Maps have trouble loading.Please try later.');
 }
