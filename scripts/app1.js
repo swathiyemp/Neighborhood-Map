@@ -339,5 +339,5 @@ ko.applyBindings(viewModel);
 
 //Error Handling for Google Maps
 function showerror() {
-    alert('Google Maps have trouble loading.Please try later.');
+    alert('Google Maps have trouble loading.Please try later!');
 }
